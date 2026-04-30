@@ -1,30 +1,41 @@
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import Screen from '../components/Screen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export default function SplashScreen({ navigation }: Props) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Intro');
-    }, 1000);
-
+    const timer = setTimeout(() => navigation.replace('Intro'), 1000);
     return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" />
-    </View>
+    <Screen>
+      <View style={styles.content}>
+        <Text style={styles.title}>Beauty on call</Text>
+        <Text style={styles.subtitle}>Сервіс бронювання beauty - послуг</Text>
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingBottom: 120,
+  },
+  title: {
+    fontSize: 48,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
   },
 });
