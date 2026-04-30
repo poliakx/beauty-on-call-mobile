@@ -20,7 +20,7 @@ export default function AppButton({
       disabled={disabled || loading}
     >
       {loading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color="#333" />
       ) : (
         <Text style={styles.text}>{title}</Text>
       )}
@@ -30,16 +30,19 @@ export default function AppButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#000',
-    padding: 14,
-    borderRadius: 8,
+    backgroundColor: '#EDEDED',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignItems: 'center',
+    alignSelf: 'center',
+    minWidth: 200,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
   text: {
-    color: '#fff',
+    color: '#222',
     fontWeight: '600',
   },
 });
