@@ -1,10 +1,13 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
+import type { ViewStyle, TextStyle } from 'react-native';
 
 type Props = {
   title: string;
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
+  containerStyle?: ViewStyle;
+  textStyle?: TextStyle;
 };
 
 export default function AppButton({
@@ -12,17 +15,19 @@ export default function AppButton({
   onPress,
   disabled,
   loading,
+  containerStyle,
+  textStyle,
 }: Props) {
   return (
     <Pressable
-      style={[styles.button, disabled && styles.disabled]}
+      style={[styles.button, containerStyle, disabled && styles.disabled]}
       onPress={onPress}
       disabled={disabled || loading}
     >
       {loading ? (
         <ActivityIndicator color="#333" />
       ) : (
-        <Text style={styles.text}>{title}</Text>
+        <Text style={[styles.text, textStyle]}>{title}</Text>
       )}
     </Pressable>
   );
@@ -31,12 +36,10 @@ export default function AppButton({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#EDEDED',
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: 'center',
-    alignSelf: 'center',
-    minWidth: 200,
   },
   disabled: {
     opacity: 0.6,
@@ -44,5 +47,6 @@ const styles = StyleSheet.create({
   text: {
     color: '#222',
     fontWeight: '600',
+    fontSize: 16,
   },
 });
