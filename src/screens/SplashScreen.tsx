@@ -8,15 +8,18 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export default function SplashScreen({ navigation }: Props) {
   useEffect(() => {
-    const timer = setTimeout(() => navigation.replace('Intro'), 1000);
+    const timer = setTimeout(() => {
+      navigation.replace('Intro');
+    }, 3000);
+
     return () => clearTimeout(timer);
   }, [navigation]);
 
   return (
     <Screen>
       <View style={styles.content}>
-        <Text style={styles.title}>Beauty on call</Text>
-        <Text style={styles.subtitle}>Сервіс бронювання beauty - послуг</Text>
+        <Text style={styles.title}>Beauty On Call</Text>
+        <Text style={styles.subtitle}>Сервіс бронювання beauty-послуг</Text>
       </View>
     </Screen>
   );
@@ -25,12 +28,12 @@ export default function SplashScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 120,
   },
   title: {
-    fontSize: 48,
+    fontSize: 40,
     fontWeight: '600',
     marginBottom: 8,
   },
