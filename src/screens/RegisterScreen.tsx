@@ -1,98 +1,365 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '../types/navigation';
 import Screen from '../components/Screen';
-import AppInput from '../components/AppInput';
 import AppButton from '../components/AppButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
+const CITIES = ['Київ', 'Харків', 'Одеса', 'Дніпро', 'Львів'];
+
+const DISTRICTS: Record<string, string[]> = {
+  Київ: [
+    'Голосіївський',
+    'Дарницький',
+    'Деснянський',
+    'Дніпровський',
+    'Оболонський',
+    'Печерський',
+    'Подільський',
+    'Святошинський',
+    'Соломʼянський',
+    'Шевченківський',
+  ],
+  Харків: [
+    'Холодногірський',
+    'Основʼянський',
+    'Слобідський',
+    'Київський',
+    'Новобаварський',
+    'Московський',
+    'Немишлянський',
+    'Червонозаводський',
+  ],
+  Одеса: [
+    'Приморський',
+    'Малиновський',
+    'Суворовський',
+    'Хаджибейський',
+    'Київський',
+  ],
+  Дніпро: [
+    'Амур-Нижньодніпровський',
+    'Індустріальний',
+    'Новокодацький',
+    'Самарський',
+    'Центральний',
+  ],
+  Львів: [
+    'Галицький',
+    'Залізничний',
+    'Личаківський',
+    'Сихівський',
+    'Франківський',
+    'Шевченківський',
+  ],
+};
+
 export default function RegisterScreen({ route }: Props) {
-  const role = route.params?.role;
+  const role = route.params?.role ?? 'client';
 
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
+
+  const [showCities, setShowCities] = useState(false);
+  const [showDistricts, setShowDistricts] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  if (!role) {
-    return (
-      <Screen centered>
-        <Text>Role is missing</Text>
-      </Screen>
-    );
+  function handlePhoneChange(value: string) {
+    const onlyDigits = value.replace(/\D/g, '').slice(0, 9);
+    setPhone(onlyDigits);
+  }
+
+  function handleCitySelect(selectedCity: string) {
+    setCity(selectedCity);
+    setDistrict('');
+    setShowCities(false);
+  }
+
+  function handleDistrictSelect(selectedDistrict: string) {
+    setDistrict(selectedDistrict);
+    setShowDistricts(false);
+  }
+
+  function validateForm() {
+    if (!name.trim()) {
+      return "Введіть ім'я";
+    }
+
+    if (phone.length !== 9) {
+      return 'Введіть 9 цифр номера телефону';
+    }
+
+    if (!city) {
+      return 'Оберіть місто';
+    }
+
+    if (!district) {
+      return 'Оберіть район';
+    }
+
+    return '';
   }
 
   function handleSubmit() {
     if (loading) return;
 
-    if (!name.trim() || !email.trim()) {
-      setError('Please enter name and email');
-      return;
-    }
+    const validationError = validateForm();
 
-    if (!email.includes('@')) {
-      setError('Invalid email');
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setError('');
     setLoading(true);
 
-    setTimeout(() => setLoading(false), 1000);
+    const payload = {
+      name: name.trim(),
+      phone: `+380${phone}`,
+      city,
+      district,
+      role,
+    };
+
+    console.log('Register payload:', payload);
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }
+
+  const availableDistricts = city ? DISTRICTS[city] ?? [] : [];
 
   return (
     <Screen>
-      <Text style={styles.title}>Register</Text>
-      <Text style={styles.subtitle}>Selected role: {role}</Text>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Реєстрація</Text>
 
-      <View style={styles.form}>
-        <AppInput
-          label="Name"
+        <Text style={styles.label}>Ваше ім&apos;я</Text>
+        <TextInput
+          style={styles.input}
           value={name}
           onChangeText={setName}
-          placeholder="Your name"
+          placeholder="Введіть ім'я"
         />
 
-        <AppInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="you@example.com"
-          keyboardType="email-address"
-        />
+        <Text style={styles.label}>Ваш номер телефону</Text>
+        <View style={styles.phoneRow}>
+          <View style={styles.phonePrefix}>
+            <Text style={styles.prefixText}>+380</Text>
+          </View>
+
+          <TextInput
+            style={[styles.input, styles.phoneInput]}
+            value={phone}
+            onChangeText={handlePhoneChange}
+            keyboardType="phone-pad"
+            placeholder="XX XXX XX XX"
+          />
+        </View>
+
+        <Text style={styles.label}>Місто</Text>
+        <TouchableOpacity
+          style={styles.dropdown}
+          onPress={() => {
+            setShowCities(prev => !prev);
+            setShowDistricts(false);
+          }}
+        >
+          <Text style={city ? styles.dropdownValue : styles.dropdownPlaceholder}>
+            {city || 'Оберіть місто'}
+          </Text>
+          <Text style={styles.chevron}>{'\u2304'}</Text>
+        </TouchableOpacity>
+
+        {showCities && (
+          <View style={styles.dropdownList}>
+            {CITIES.map(item => (
+              <TouchableOpacity
+                key={item}
+                style={styles.dropdownItem}
+                onPress={() => handleCitySelect(item)}
+              >
+                <Text>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <Text style={styles.label}>Район</Text>
+        <TouchableOpacity
+          style={[styles.dropdown, !city && styles.dropdownDisabled]}
+          onPress={() => {
+            if (!city) return;
+
+            setShowDistricts(prev => !prev);
+            setShowCities(false);
+          }}
+        >
+          <Text
+            style={district ? styles.dropdownValue : styles.dropdownPlaceholder}
+          >
+            {district || 'Оберіть район'}
+          </Text>
+          <Text style={styles.chevron}>{'\u2304'}</Text>
+        </TouchableOpacity>
+
+        {showDistricts && (
+          <View style={styles.dropdownList}>
+            {availableDistricts.map(item => (
+              <TouchableOpacity
+                key={item}
+                style={styles.dropdownItem}
+                onPress={() => handleDistrictSelect(item)}
+              >
+                <Text>{item}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <AppButton
-          title="Submit"
+          title="Зареєструватись"
           onPress={handleSubmit}
           loading={loading}
-          disabled={loading}
+          containerStyle={styles.button}
         />
-      </View>
+
+        <Text style={styles.legal}>
+          {'Створюючи обліковий запис, я погоджуюсь з '}
+          <Text style={styles.legalLink}>Умовами надання послуг</Text>
+          {' і '}
+          <Text style={styles.legalLink}>Політикою конфіденційності</Text>
+          {' Beauty on call'}
+        </Text>
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: 24,
   },
-  subtitle: {
-    fontSize: 16,
+  label: {
+    fontSize: 14,
+    color: '#111',
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 16,
+    fontSize: 15,
+    backgroundColor: '#fff',
   },
-  form: {
-    width: '100%',
-    marginTop: 8,
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  phonePrefix: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+  },
+  prefixText: {
+    fontSize: 15,
+    color: '#111',
+  },
+  phoneInput: {
+    flex: 1,
+    marginBottom: 0,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  dropdownDisabled: {
+    opacity: 0.6,
+  },
+  dropdownValue: {
+    fontSize: 15,
+    color: '#111',
+  },
+  dropdownPlaceholder: {
+    fontSize: 15,
+    color: '#aaa',
+  },
+  chevron: {
+    fontSize: 18,
+    color: '#555',
+  },
+  dropdownList: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginTop: -12,
+    marginBottom: 16,
+    backgroundColor: '#fff',
+  },
+  dropdownItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   error: {
     color: 'red',
-    marginBottom: 8,
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  button: {
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  legal: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#555',
+    lineHeight: 18,
+  },
+  legalLink: {
+    textDecorationLine: 'underline',
+    color: '#111',
   },
 });

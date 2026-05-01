@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '../types/navigation';
 import Screen from '../components/Screen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;

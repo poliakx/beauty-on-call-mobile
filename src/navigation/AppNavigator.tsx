@@ -1,18 +1,12 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types/navigation';
 
 import SplashScreen from '../screens/SplashScreen';
 import IntroScreen from '../screens/IntroScreen';
 import RoleSelectScreen from '../screens/RoleSelectScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-
-export type RootStackParamList = {
-	Splash: undefined;
-	Intro: undefined;
-	RoleSelect: undefined;
-	Register: { role?: string } | undefined;
-};
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

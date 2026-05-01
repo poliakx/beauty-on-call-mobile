@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Screen from '../components/Screen';
 import AppButton from '../components/AppButton';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
+import type { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
 
