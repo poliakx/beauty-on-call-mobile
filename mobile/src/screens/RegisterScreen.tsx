@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +15,8 @@ import Screen from '../components/Screen';
 import AppButton from '../components/AppButton';
 import { registerUser } from '../api/register';
 import { CITIES, DISTRICTS } from '../constants/locations';
+import { getErrorMessage } from '../utils/getErrorMessage';
+import { logger } from '../utils/logger';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -58,39 +61,40 @@ export default function RegisterScreen({ route, navigation }: Props) {
     return '';
   }
 
-  async function handleSubmit() {
-    if (loading) return;
+  const handleSubmit = async () => {
+  if (loading) return;
 
-    Keyboard.dismiss();
+  if (!name.trim() || !phone.trim() || !city || !district) {
+    Alert.alert('Validation error', 'Please fill in all fields.');
+    return;
+  }
 
-    const validationError = validateForm();
-
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setError('');
+  try {
     setLoading(true);
 
-    try {
-      const payload = {
-        name: name.trim(),
-        phone: `+380${phone}`,
-        city,
-        district,
-        role,
-      };
+    logger.log('Submitting registration', { city, district, role });
 
-      await registerUser(payload);
+    await registerUser({
+      name: name.trim(),
+      phone: phone.trim(),
+      city,
+      district,
+      role,
+    });
 
-      navigation.reset({ index: 0, routes: [{ name: 'Success' }] });
-    } catch {
-      setError('Не вдалося зареєструватись. Спробуйте ще раз.');
-    } finally {
-      setLoading(false);
-    }
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Success' }],
+    });
+
+    logger.log('Registration successful');
+  } catch (error) {
+    logger.error('Registration failed', getErrorMessage(error));
+    Alert.alert('Registration failed', getErrorMessage(error));
+  } finally {
+    setLoading(false);
   }
+};
 
   const availableDistricts = city ? DISTRICTS[city] ?? [] : [];
 

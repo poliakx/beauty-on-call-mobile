@@ -28,14 +28,14 @@ export default function RoleSelectScreen({ navigation }: Props) {
           <AppButton
             title="Я — майстер"
             onPress={() => handleSelectRole('master')}
-            containerStyle={{ width: '48%' }}
+            containerStyle={styles.roleBtn}
           />
 
           <AppButton
             title="Я — клієнт"
             onPress={() => handleSelectRole('client')}
-            containerStyle={{ width: '48%' }}
-            textStyle={{ color: '#d33' }}
+            containerStyle={styles.roleBtn}
+            textStyle={styles.clientText}
           />
         </View>
       </View>
@@ -75,18 +75,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-  roleButton: {
-    backgroundColor: '#EDEDED',
-    paddingVertical: 12,
-    borderRadius: 12,
-    width: '48%',
-    alignItems: 'center',
+  roleBtn: {
+    flex: 1,
+    borderRadius: 10,
   },
-  roleButtonText: {
-    color: '#222',
-    fontWeight: '600',
-  },
-  roleButtonTextAccent: {
+  clientText: {
     color: '#d33',
   },
 });
