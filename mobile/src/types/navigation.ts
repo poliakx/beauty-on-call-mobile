@@ -3,4 +3,5 @@ export type RootStackParamList = {
   Intro: undefined;
   RoleSelect: undefined;
   Register: { role?: 'client' | 'master' } | undefined;
+  Success: undefined;
 };

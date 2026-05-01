@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
@@ -16,7 +17,7 @@ import { CITIES, DISTRICTS } from '../constants/locations';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
-export default function RegisterScreen({ route }: Props) {
+export default function RegisterScreen({ route, navigation }: Props) {
   const role = route.params?.role ?? 'client';
 
   const [name, setName] = useState('');
@@ -36,68 +37,61 @@ export default function RegisterScreen({ route }: Props) {
   }
 
   function handleCitySelect(selectedCity: string) {
+    Keyboard.dismiss();
     setCity(selectedCity);
     setDistrict('');
     setShowCities(false);
   }
 
   function handleDistrictSelect(selectedDistrict: string) {
+    Keyboard.dismiss();
     setDistrict(selectedDistrict);
     setShowDistricts(false);
   }
 
   function validateForm() {
-    if (!name.trim()) {
-      return "Введіть ім'я";
-    }
-
-    if (phone.length !== 9) {
-      return 'Введіть 9 цифр номера телефону';
-    }
-
-    if (!city) {
-      return 'Оберіть місто';
-    }
-
-    if (!district) {
-      return 'Оберіть район';
-    }
+    if (!name.trim()) return "Введіть ім'я";
+    if (phone.length !== 9) return 'Введіть 9 цифр номера телефону';
+    if (!city) return 'Оберіть місто';
+    if (!district) return 'Оберіть район';
 
     return '';
   }
 
   async function handleSubmit() {
-  if (loading) return;
+    if (loading) return;
 
-  const validationError = validateForm();
+    Keyboard.dismiss();
 
-  if (validationError) {
-    setError(validationError);
-    return;
+    const validationError = validateForm();
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        name: name.trim(),
+        phone: `+380${phone}`,
+        city,
+        district,
+        role,
+      };
+
+      await registerUser(payload);
+
+      navigation.reset({ index: 0, routes: [{ name: 'Success' }] });
+    } catch {
+      setError('Не вдалося зареєструватись. Спробуйте ще раз.');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  setError('');
-  setLoading(true);
-
-  try {
-    const payload = {
-      name: name.trim(),
-      phone: `+380${phone}`,
-      city,
-      district,
-      role,
-    };
-
-    await registerUser(payload);
-
-    console.log('Register payload:', payload);
-    console.log('Registration successful');
-  } catch {
-    setError('Не вдалося зареєструватись. Спробуйте ще раз.');
-  } finally {
-    setLoading(false);
-  }
-}
   const availableDistricts = city ? DISTRICTS[city] ?? [] : [];
 
   return (
@@ -135,6 +129,7 @@ export default function RegisterScreen({ route }: Props) {
         <TouchableOpacity
           style={styles.dropdown}
           onPress={() => {
+            Keyboard.dismiss();
             setShowCities(prev => !prev);
             setShowDistricts(false);
           }}
@@ -163,6 +158,8 @@ export default function RegisterScreen({ route }: Props) {
         <TouchableOpacity
           style={[styles.dropdown, !city && styles.dropdownDisabled]}
           onPress={() => {
+            Keyboard.dismiss();
+
             if (!city) return;
 
             setShowDistricts(prev => !prev);

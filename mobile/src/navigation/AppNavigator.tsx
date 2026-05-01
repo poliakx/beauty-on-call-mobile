@@ -7,6 +7,7 @@ import SplashScreen from '../screens/SplashScreen';
 import IntroScreen from '../screens/IntroScreen';
 import RoleSelectScreen from '../screens/RoleSelectScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import SuccessScreen from '../screens/SuccessScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -17,6 +18,7 @@ export default function AppNavigator() {
 			<Stack.Screen name="Intro" component={IntroScreen} />
 			<Stack.Screen name="RoleSelect" component={RoleSelectScreen} />
 			<Stack.Screen name="Register" component={RegisterScreen} />
+			<Stack.Screen name="Success" component={SuccessScreen} />
 		</Stack.Navigator>
 	);
 }

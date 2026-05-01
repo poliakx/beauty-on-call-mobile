@@ -1,5 +1,11 @@
 import { ReactNode } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 
 type Props = {
   children: ReactNode;
@@ -8,11 +14,13 @@ type Props = {
 
 export default function Screen({ children, centered }: Props) {
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={[styles.container, centered && styles.centered]}>
-        {children}
-      </View>
-    </SafeAreaView>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.safe}>
+        <View style={[styles.container, centered && styles.centered]}>
+          {children}
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
