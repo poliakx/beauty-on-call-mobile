@@ -15,7 +15,6 @@ import Screen from '../components/Screen';
 import AppButton from '../components/AppButton';
 import { registerUser } from '../api/register';
 import { CITIES, DISTRICTS } from '../constants/locations';
-import { getErrorMessage } from '../utils/getErrorMessage';
 import { logger } from '../utils/logger';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
@@ -62,39 +61,45 @@ export default function RegisterScreen({ route, navigation }: Props) {
   }
 
   const handleSubmit = async () => {
-  if (loading) return;
+    if (loading) return;
 
-  if (!name.trim() || !phone.trim() || !city || !district) {
-    Alert.alert('Validation error', 'Please fill in all fields.');
-    return;
-  }
+    const validationError = validateForm();
+    if (validationError) {
+      Alert.alert('Помилка', validationError);
+      return;
+    }
 
-  try {
+    setError('');
     setLoading(true);
 
-    logger.log('Submitting registration', { city, district, role });
+    try {
+      logger.log('Submitting registration', { city, district, role });
 
-    await registerUser({
-      name: name.trim(),
-      phone: phone.trim(),
-      city,
-      district,
-      role,
-    });
+      await registerUser({
+        name: name.trim(),
+        phone: `+380${phone}`,
+        city,
+        district,
+        role,
+      });
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Success' }],
-    });
+      logger.log('Registration successful');
 
-    logger.log('Registration successful');
-  } catch (error) {
-    logger.error('Registration failed', getErrorMessage(error));
-    Alert.alert('Registration failed', getErrorMessage(error));
-  } finally {
-    setLoading(false);
-  }
-};
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Success' }],
+      });
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : 'Не вдалося зареєструватися. Спробуйте ще раз.';
+
+      logger.error('Registration failed', message);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const availableDistricts = city ? DISTRICTS[city] ?? [] : [];
 
