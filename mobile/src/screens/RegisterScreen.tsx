@@ -11,57 +11,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import Screen from '../components/Screen';
 import AppButton from '../components/AppButton';
+import { registerUser } from '../api/register';
+import { CITIES, DISTRICTS } from '../constants/locations';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
-
-const CITIES = ['Київ', 'Харків', 'Одеса', 'Дніпро', 'Львів'];
-
-const DISTRICTS: Record<string, string[]> = {
-  Київ: [
-    'Голосіївський',
-    'Дарницький',
-    'Деснянський',
-    'Дніпровський',
-    'Оболонський',
-    'Печерський',
-    'Подільський',
-    'Святошинський',
-    'Соломʼянський',
-    'Шевченківський',
-  ],
-  Харків: [
-    'Холодногірський',
-    'Основʼянський',
-    'Слобідський',
-    'Київський',
-    'Новобаварський',
-    'Московський',
-    'Немишлянський',
-    'Червонозаводський',
-  ],
-  Одеса: [
-    'Приморський',
-    'Малиновський',
-    'Суворовський',
-    'Хаджибейський',
-    'Київський',
-  ],
-  Дніпро: [
-    'Амур-Нижньодніпровський',
-    'Індустріальний',
-    'Новокодацький',
-    'Самарський',
-    'Центральний',
-  ],
-  Львів: [
-    'Галицький',
-    'Залізничний',
-    'Личаківський',
-    'Сихівський',
-    'Франківський',
-    'Шевченківський',
-  ],
-};
 
 export default function RegisterScreen({ route }: Props) {
   const role = route.params?.role ?? 'client';
@@ -113,19 +66,20 @@ export default function RegisterScreen({ route }: Props) {
     return '';
   }
 
-  function handleSubmit() {
-    if (loading) return;
+  async function handleSubmit() {
+  if (loading) return;
 
-    const validationError = validateForm();
+  const validationError = validateForm();
 
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
 
-    setError('');
-    setLoading(true);
+  setError('');
+  setLoading(true);
 
+  try {
     const payload = {
       name: name.trim(),
       phone: `+380${phone}`,
@@ -134,13 +88,16 @@ export default function RegisterScreen({ route }: Props) {
       role,
     };
 
+    await registerUser(payload);
+
     console.log('Register payload:', payload);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    console.log('Registration successful');
+  } catch {
+    setError('Не вдалося зареєструватись. Спробуйте ще раз.');
+  } finally {
+    setLoading(false);
   }
-
+}
   const availableDistricts = city ? DISTRICTS[city] ?? [] : [];
 
   return (

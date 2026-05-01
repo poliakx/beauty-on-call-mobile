@@ -7,7 +7,7 @@ import type { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'RoleSelect'>;
 
 export default function RoleSelectScreen({ navigation }: Props) {
-  const handleSelectRole = (role: 'client' | 'specialist') =>
+  const handleSelectRole = (role: 'client' | 'master') =>
     navigation.navigate('Register', { role });
 
   return (
@@ -27,7 +27,7 @@ export default function RoleSelectScreen({ navigation }: Props) {
         <View style={styles.row}>
           <AppButton
             title="Я — майстер"
-            onPress={() => handleSelectRole('specialist')}
+            onPress={() => handleSelectRole('master')}
             containerStyle={{ width: '48%' }}
           />
 
